@@ -4,9 +4,9 @@ applications:
   instances: 1
   memory: 256M
   routes:
-  - route: allocations-pal-INITIALS.apps.sys.evans.pal.pivotal.io
+  - route: allocations-pal-ankitintial.apps.evans.pal.pivotal.io
   path: Applications/AllocationsServer/bin/Release/netcoreapp2.1/publish
   env:
-    REGISTRATION_SERVER_ENDPOINT: https://api.sys.evans.pal.pivotal.io
+    REGISTRATION_SERVER_ENDPOINT: https://registration-pal-ankitinitial.apps.evans.pal.pivotal.io
   services:
   - tracker-allocations-database
