@@ -6,12 +6,13 @@ applications:
   routes:
   - route: backlog-pal-ankitinitial.apps.evans.pal.pivotal.io
   path: Applications/BacklogServer/bin/Release/netcoreapp2.1/publish
-  # env:
+  env:
   #   REGISTRATION_SERVER_ENDPOINT: https://registration-pal-ankitinitial.apps.evans.pal.pivotal.io
+      GRANT_TYPE: client_credentials
   services:
   - tracker-backlog-database
   - tracker-service-registry
   - tracker-circuit-breaker-dashboard
   - tracker-amqp
   - tracker-sso
-  GRANT_TYPE: client_credentials
+  
