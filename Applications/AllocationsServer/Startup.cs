@@ -31,23 +31,25 @@ namespace AllocationsServer
         {
             // Add framework services.
             services.AddMvc(mvcOptions =>
-           {
+            {
                 if (!Configuration.GetValue("DISABLE_AUTH", false))
-               {
-                   // Set Authorized as default policy
-                   var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                   .RequireClaim("scope", "uaa.resource")
-                    .Build();
+                {
+                    // Set Authorized as default policy
+                    var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .RequireClaim("scope", "uaa.resource")
+                        .Build();
                    mvcOptions.Filters.Add(new AuthorizeFilter(policy));
-               }
-          });
-             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddCloudFoundryJwtBearer(Configuration);
+                }
+            });
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+            services.AddCloudFoundryJwtBearer(Configuration);
             services.AddDiscoveryClient(Configuration);
             services.AddDbContext<AllocationContext>(options => options.UseMySql(Configuration));
             services.AddScoped<IAllocationDataGateway, AllocationDataGateway>();
-services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddSingleton<IProjectClient>(sp =>
             {
                 var handler = new DiscoveryHttpClientHandler(sp.GetService<IDiscoveryClient>());
@@ -57,11 +59,9 @@ services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 };
 
                 var logger = sp.GetService<ILogger<ProjectClient>>();
-                
-                  var contextAccessor = sp.GetService<IHttpContextAccessor>();
-
-                return new ProjectClient(httpClient, logger);
-                 return new ProjectClient(
+                var contextAccessor = sp.GetService<IHttpContextAccessor>();
+             
+                return new ProjectClient(
                     httpClient, logger,
                     () => contextAccessor.HttpContext.GetTokenAsync("access_token")
                 );
@@ -75,9 +75,9 @@ services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-  app.UseDiscoveryClient();
-  app.UseHystrixMetricsStream();
-          app.UseHystrixRequestContext();
+            app.UseDiscoveryClient();
+            app.UseHystrixMetricsStream();
+            app.UseHystrixRequestContext();
             app.UseMvc();
         }
     }
