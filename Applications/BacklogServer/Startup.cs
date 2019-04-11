@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Pivotal.Discovery.Client;
 using Steeltoe.Common.Discovery;
+using Steeltoe.CircuitBreaker.Hystrix;
 namespace BacklogServer
 {
     public class Startup
@@ -25,7 +26,7 @@ namespace BacklogServer
         {
             // Add framework services.
             services.AddMvc();
- services.AddDiscoveryClient(Configuration);
+             services.AddDiscoveryClient(Configuration);
             services.AddDbContext<StoryContext>(options => options.UseMySql(Configuration));
             services.AddScoped<IStoryDataGateway, StoryDataGateway>();
 
@@ -37,8 +38,12 @@ namespace BacklogServer
                     BaseAddress = new Uri(Configuration.GetValue<string>("REGISTRATION_SERVER_ENDPOINT"))
                 };
 
-                return new ProjectClient(httpClient);
-            });
+               //return new ProjectClient(httpClient);+                 
+            var logger = sp.GetService<ILogger<ProjectClient>>();
+               return new ProjectClient(httpClient, logger);
+              });
+
+            services.AddHystrixMetricsStream(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +52,8 @@ namespace BacklogServer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
   app.UseDiscoveryClient();
+  app.UseHystrixMetricsStream();
+          app.UseHystrixRequestContext();
             app.UseMvc();
         }
     }
